@@ -1,66 +1,169 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Project requirements 
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+### Database structure
 
-## About Laravel
+#### Models: 
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**1. User** 
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Holds information about the user. 3 main user groups: 
+- Admin
+- Company 
+- Individual
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Columns:
+```
+- uuid (uuid)
+- first_name (string)
+- last_name (string)
+- email (string)
+- group (integer)
+- password (hash)
+- phone (string)
+- company (string - nullable)
+- country_id (integer)
+- preferred_language (string - default to “en”)
+- privacy (bool) - default to false
+- timestamps (default laravel timestamps)
+- email_verified_at (default laravel timestamp)
+```
 
-## Learning Laravel
+Notes: 
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- `ulid` - will use this as a primary key. Package info [here](https://github.com/robinvdvleuten/php-ulid).
+- `country_id` - related to countries table (add foreign key constraint)
+- `preferred_language` - will be used to determine preferred language of the user. For now we will default this to **_en_**
+- `privacy` - determines if user data will be shown on the post details
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+**2. Post**
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+This will represent a post that user can create. Each post will have a corresponding user & category. 
 
-## Laravel Sponsors
+Columns:
+```
+- id
+- user_id (string)
+- category_id (int)
+- type_id (int)
+- timestamps + soft deletes (default laravel columns)
+- title (string)
+- description (text)
+- country_id (integer)
+- city (string)
+- address (string)
+- zip_code (string)
+- latitude (float/double)
+- longitude (float/double)
+- active (bool) - default to true
+- status (int)
+- price (double/float)
+- price_negotiable (bool - default false)
+- attributes (json) 
+- available_from (date)  - nullable
+- available_until (date) - nullable 
+- last_renewed_on (timestamp) - nullable
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+Notes: 
+- `user_id` - related to User model - add foreign key constraint
+- `category_id` - related to Category model - add foreign key constraint
+- `country_id` - related to countries table (add foreign key constraint)
+- `type_id` - related to PostType model (add foreign key constraint)
+- `city` - will be generated automatically base on google geoLoc API
+- `address` - will be generated automatically base on google geoLoc API
+- `zip_code` - will be generated automatically base on google geoLoc API
+- `latitude` - will be generated automatically base on google geoLoc API
+- `longitude` - will be generated automatically base on google geoLoc API
+- `attributes` - list of attributes that will be added from PostAttributes list
+- `active` - used to determine if post will be visible on FE or not
+- `status` - determines the status of the property - sold, rented..
+- `price_negotiable` - used to determine if price will be negotiable, so we can show additional content on the post details page
+- `last_renewed_on` - date when the post was last manually renewed. Determines the expiry date of the post
 
-### Premium Partners
+Note 2:
+- Country will be selected from dropdown. All other fields will be selected from "location" input
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+**3. Countries** 
 
-## Contributing
+Holds list of all countries available countries and currencies in ISO3166 format. Possibly use [this](https://github.com/umpirsky/country-list) to seed the database.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Columns
+```
+- name (string)
+- code (string)
+- currency_code (string)
+```
 
-## Code of Conduct
+**4. Categories**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+List of categories. In the future, category might have a parent (multi level categories)
 
-## Security Vulnerabilities
+Columns:
+```
+- name (string)
+- parent_category_id (integer)
+```
+Notes:
+- `parent_category_id` - used to determine if category has a parent. Related to the record in the same table
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**5. PostImage**
 
-## License
+This holds all the post images. One post can have one featured image and multiple additional images
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Columns:
+```
+- post_id (integer)
+- image (string)
+- featured (boolean) - default to false
+```
+
+Notes: 
+- `post_id` - Related to Post model. Add foreign key constraint
+- `image` - path of the image. This will come from DigitalOcean S3 storage
+- `featured` - used to determine which image is the featured one
+
+**6. PostAttachment**
+
+This holds all the attachments of a post. One post can have multiple attachments with different types.
+
+Columns
+```
+- post_id (int)
+- type (string)
+- path (string)
+```
+
+Notes
+- `post_id` - Related to Post model. Add foreign key constraint
+- `path` - path of the attachment. This will come from DigitalOcean S3 storage
+
+**7. PostType**
+
+Type of the post. It can be a sell or rent.
+
+Columns:
+```
+- post_id (int)
+- type (int)
+```
+
+Notes:
+- `post_id` - Related to Post model. Add foreign key constraint
+
+**8. PostAttributes**
+
+List of available properties/attributes for a post (property size, land size...). Each property can have a different unit and type. This will be used on posts form, where user will be able to select this attributes and add a desired value to them
+
+Columns
+```
+- name (string)
+- unit (string)
+- mandatory (bool) - default false
+- type (string)
+- possible_values (json) - nullable
+```
+
+Notes: 
+- `mandatory` - will be used for form validation. If a field is mandatory, user won't be able to submit a form withouth that attribute
+- `possible_values` - predefined values for an attribute
+
