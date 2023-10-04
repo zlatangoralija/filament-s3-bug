@@ -50,4 +50,12 @@ class User extends Authenticatable implements FilamentUser
     {
         return true;
     }
+    public function country()
+    {
+        return $this->belongsTo(Country::class, 'country_id');
+    }
+    public function post()
+    {
+        return $this->hasMany(Post::class, 'user_id');
+    }
 }
