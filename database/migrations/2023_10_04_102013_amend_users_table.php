@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('phone');
             $table->string('company')->nullable();
             $table->string('preferred_language')->default('en');
-            $table->boolean('privacy');
+            $table->boolean('privacy')->default(0);
         });
     }
 

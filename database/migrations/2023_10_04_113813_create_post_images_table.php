@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('post_id');
             $table->foreign('post_id')->references('id')->on('posts');
-            $table->string('image');
+            $table->string('path');
             $table->boolean('featured')->default(0);
             $table->timestamps();
         });

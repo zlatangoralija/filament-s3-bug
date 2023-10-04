@@ -13,14 +13,12 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id');
+            $table->uuid('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->unsignedBigInteger('category_id');
             $table->foreign('category_id')->references('id')->on('categories');
             $table->unsignedBigInteger('type_id');
             $table->foreign('type_id')->references('id')->on('post_types');
-            $table->timestamps();
-            $table->softDeletes();
             $table->string('title');
             $table->text('description');
             $table->unsignedBigInteger('country_id');
@@ -34,9 +32,11 @@ return new class extends Migration
             $table->integer('status');
             $table->double('price');
             $table->boolean('price_negotiable')->default(0);
-            $table->json('attributes');
+            $table->json('attributes')->nullable();
             $table->date('available_from')->nullable();
             $table->date('available_until')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
             $table->timestamp('last_renewed_on')->nullable();
         });
     }
