@@ -54,6 +54,7 @@ class UserResource extends Resource
                 Forms\Components\TextInput::make('company')
                     ->maxLength(255),
                 Forms\Components\Toggle::make('privacy')
+                    ->label('Show user details on posts')
                     ->required(),
             ]);
     }
