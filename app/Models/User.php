@@ -4,15 +4,18 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasName;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Filament\Panel;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasName
 {
     use HasApiTokens, HasFactory, Notifiable;
+
+    protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.
@@ -20,7 +23,14 @@ class User extends Authenticatable implements FilamentUser
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'id',
+        'first_name',
+        'last_name',
+        'phone',
+        'company',
+        'preferred_language',
+        'privacy',
+        'country_id',
         'email',
         'password',
         'group',
@@ -42,14 +52,37 @@ class User extends Authenticatable implements FilamentUser
      * @var array<string, string>
      */
     protected $casts = [
+        'id' => 'string',
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        return $this->group == self::$_GROUP_ADMIN;
     }
+
+    public function getFilamentName(): string
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
+
+    public static $_GROUP_ADMIN = 1;
+    public static $_GROUP_INDIVIDUAL = 2;
+    public static $_GROUP_COMPANY = 3;
+
+    public static function getGroups(){
+        return [
+            self::$_GROUP_ADMIN => 'Admin',
+            self::$_GROUP_INDIVIDUAL => 'Individual',
+            self::$_GROUP_COMPANY => 'Company',
+        ];
+    }
+
+    public function getGroup(){
+        return self::getGroups()[$this->group];
+    }
+
     public function country()
     {
         return $this->belongsTo(Country::class, 'country_id');
