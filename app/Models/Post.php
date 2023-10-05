@@ -26,11 +26,11 @@ class Post extends Model
     {
         return $this->belongsTo(PostType::class, 'type_id');
     }
-    public function postImage()
+    public function postImages()
     {
         return $this->hasMany(PostImage::class, 'post_id');
     }
-    public function postAttachment()
+    public function postAttachments()
     {
         return $this->hasMany(PostAttachment::class, 'post_id');
     }

@@ -9,11 +9,11 @@ class Country extends Model
 {
     use HasFactory;
 
-    public function user()
+    public function users()
     {
         return $this->hasMany(User::class, 'country_id');
     }
-    public function post()
+    public function posts()
     {
         return $this->hasMany(Post::class, 'country_id');
     }
