@@ -4,7 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PostAttributesResource\Pages;
 use App\Filament\Resources\PostAttributesResource\RelationManagers;
-use App\Models\PostAttributes;
+use App\Models\PostAttribute;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,10 +13,11 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Infolists\Components\TextEntry;
 
 class PostAttributesResource extends Resource
 {
-    protected static ?string $model = PostAttributes::class;
+    protected static ?string $model = PostAttribute::class;
 
     protected static ?string $navigationIcon = 'heroicon-m-cog';
 
@@ -26,15 +28,17 @@ class PostAttributesResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('unit')
-                    ->required()
-                    ->maxLength(255),
+                Forms\Components\Select::make('unit')
+                    ->options(PostAttribute::getUnits())
+                    ->allowHtml()
+                    ->required(),
+                Forms\Components\Select::make('type')
+                    ->options(PostAttribute::getTypes())
+                    ->required(),
+                Forms\Components\TagsInput::make('possible_values')
+                    ->placeholder('Enter possible values'),
                 Forms\Components\Toggle::make('mandatory')
                     ->required(),
-                Forms\Components\TextInput::make('type')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('possible_values'),
             ]);
     }
 
@@ -45,11 +49,13 @@ class PostAttributesResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('unit')
+                    ->formatStateUsing(fn (string $state, PostAttribute $postAttribute): string => __($postAttribute->getUnit()))
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('type')
+                    ->formatStateUsing(fn (string $state, PostAttribute $postAttribute): string => __($postAttribute->getType()))
                     ->searchable(),
                 Tables\Columns\IconColumn::make('mandatory')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('type')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
