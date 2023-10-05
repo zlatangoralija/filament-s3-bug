@@ -10,6 +10,9 @@ export default function Header({auth}) {
                         <>
                             <Link className="mr-2" href="/">Home</Link>
                             <Link className="mr-2" href={route('dashboard')}>Dashboard</Link>
+                            {auth.user.group == 1 &&
+                                <a className="mr-2" href={route('filament.admin.pages.dashboard')}>Admin</a>
+                            }
                             <Link className="mr-2" href={route('logout')} method="post" as="button">Logout</Link>
                         </>
                     }
