@@ -18,7 +18,7 @@ class CategoryFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'parent_category_id' => rand(1, 100)
+            'parent_category_id' => null
         ];
     }
 }

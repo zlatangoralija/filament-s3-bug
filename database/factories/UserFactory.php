@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Country;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Symfony\Component\Uid\Ulid;
@@ -26,7 +27,7 @@ class UserFactory extends Factory
             'phone' => fake()->unique()->phoneNumber(),
             'company' => fake()->unique()->company(),
             'group' => rand(1, 3),
-            'country_id' => rand(1, 270),
+            'country_id' => rand(1, Country::count()),
             'email_verified_at' => now(),
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
             'remember_token' => Str::random(10),

@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Country;
+use App\Models\PostType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -19,21 +21,20 @@ class PostFactory extends Factory
     public function definition(): array
     {
         $faker = \Faker\Factory::create();
-        $toReturn = [];
-        $toReturn = [
+
+        return [
             'category_id' => rand(1, 100),
-            'type_id' => rand(1, 100),
-            'title' => Str::random(10),
-            'description' => Str::random(100),
-            'country_id' => rand(1, 242),
-            'city' => Str::random(7),
-            'address' => Str::random(10),
+            'type_id' => PostType::inRandomOrder()->first()->id,
+            'title' => $faker->company,
+            'description' => $faker->text,
+            'country_id' => rand(1, Country::count()),
+            'city' => $faker->city,
+            'address' => $faker->address,
             'zip_code' => $faker->postcode(),
-            'latitude' => rand(1, 100) / 10,
-            'longitude' => rand(1, 100) / 10,
-            'status' => rand(1, 10),
-            'price' => rand(1, 100)
+            'latitude' => $faker->latitude,
+            'longitude' => $faker->longitude,
+            'status' => rand(0, 1),
+            'price' => $faker->randomFloat()
         ];
-        return $toReturn;
     }
 }

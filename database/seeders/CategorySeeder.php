@@ -15,12 +15,6 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        $categories = Category::factory()->count(100)->make();
-        foreach ($categories as $category) {
-            DB::table('categories')->insert([
-                'name' => $category['name'],
-                'parent_category_id' => $category['parent_category_id'],
-            ]);
-        }
+        $categories = Category::factory()->count(100)->create();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Country;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -17,17 +18,14 @@ class CountrySeeder extends Seeder
         $countries = new Countries();
         $allCountries = $countries->all();
 
-
         foreach ($allCountries as $country) {
-            $commonName = $country->name->common;
-            $currencyCode = $country->currencies[0] ?? 'EUR';
-            $code = $country['postal'] ?? 'N/A';
-
-            DB::table('countries')->insert([
-                'name' => $commonName,
-                'code' => $code,
-                'currency_code' => $currencyCode,
-            ]);
+            if(isset($country->postal) && isset($country->name->common)){
+                Country::create([
+                    'name' => $country->name->common,
+                    'code' => $country->postal,
+                    'currency_code' => $country->currencies[0] ?? 'EUR',
+                ]);
+            }
         }
     }
 }

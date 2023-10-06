@@ -14,11 +14,6 @@ class PostTypeSeeder extends Seeder
      */
     public function run(): void
     {
-        $postTypes = PostType::factory()->count(100)->make();
-        foreach ($postTypes as $postType) {
-            DB::table('post_types')->insert([
-                'type' => $postType['type'],
-            ]);
-        }
+        $postTypes = PostType::factory()->count(5)->create();
     }
 }

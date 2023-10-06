@@ -9,6 +9,12 @@ class Country extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'code',
+        'currency_code',
+    ];
+
     public function users()
     {
         return $this->hasMany(User::class, 'country_id');
