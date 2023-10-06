@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Date;
@@ -17,50 +18,20 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $faker = \Faker\Factory::create();
-        for ($i = 1; $i <= 33; $i++) {
+        $users = User::factory()->count(100)->make();
+        foreach ($users as $user) {
             DB::table('users')->insert([
-                'id' => $i,
-                'first_name' => Str::random(10),
-                'last_name' => Str::random(10),
-                'phone' => $faker->phoneNumber(),
-                'company' => $faker->word . ' ' . $faker->word,
-                'email' => Str::random(10) . '@gmail.com',
-                'group' => 1,
-                'country_id' => rand(1, 242),
-                'email_verified_at' => now(),
-                'password' => Hash::make('password'),
-                'remember_token' => Str::random(20),
-            ]);
-        }
-        for ($i = 34; $i <= 66; $i++) {
-            DB::table('users')->insert([
-                'id' => $i,
-                'first_name' => Str::random(10),
-                'last_name' => Str::random(10),
-                'phone' => $faker->phoneNumber(),
-                'company' => $faker->word . ' ' . $faker->word,
-                'email' => Str::random(10) . '@gmail.com',
-                'group' => 2,
-                'country_id' => rand(1, 242),
-                'email_verified_at' => now(),
-                'password' => Hash::make('password'),
-                'remember_token' => Str::random(20),
-            ]);
-        }
-        for ($i = 67; $i <= 100; $i++) {
-            DB::table('users')->insert([
-                'id' => $i,
-                'first_name' => Str::random(10),
-                'last_name' => Str::random(10),
-                'phone' => $faker->phoneNumber(),
-                'company' => $faker->word . ' ' . $faker->word,
-                'email' => Str::random(10) . '@gmail.com',
-                'group' => 3,
-                'country_id' => rand(1, 242),
-                'email_verified_at' => now(),
-                'password' => Hash::make('password'),
-                'remember_token' => Str::random(20),
+                'id' => $user['id'],
+                'first_name' => $user['id'],
+                'last_name' => $user['last_name'],
+                'phone' => $user['phone'],
+                'company' => $user['company'],
+                'email' => $user['email'],
+                'group' => $user['group'],
+                'country_id' => $user['country_id'],
+                'email_verified_at' => $user['email_verified_at'],
+                'password' => $user['password'],
+                'remember_token' => $user['remember_token'],
             ]);
         }
     }

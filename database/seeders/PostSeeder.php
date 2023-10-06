@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Post;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -15,78 +16,46 @@ class PostSeeder extends Seeder
     public function run(): void
     {
         $users = DB::table('users')->get();
-        $typeOneGroup = [];
-        $typeTwoGroup = [];
-        $typeThreeGroup = [];
         foreach ($users as $user) {
-            if ($user->group === 1) {
-                $typeOneGroup[] = $user;
-            };
             if ($user->group === 2) {
-                $typeTwoGroup[] = $user;
-            };
+                $posts = Post::factory()->count(20)->make();
+                foreach ($posts as $post) {
+                    DB::table('posts')->insert([
+                        'user_id' => $user->id,
+                        'category_id' => $post['category_id'],
+                        'type_id' => $post['type_id'],
+                        'title' => $post['title'],
+                        'description' => $post['description'],
+                        'country_id' => $post['country_id'],
+                        'city' => $post['city'],
+                        'address' => $post['address'],
+                        'zip_code' => $post['zip_code'],
+                        'latitude' => $post['latitude'],
+                        'longitude' => $post['longitude'],
+                        'status' => $post['status'],
+                        'price' => $post['price']
+                    ]);
+                }
+            }
             if ($user->group === 3) {
-                $typeThreeGroup[] = $user;
-            };
-        }
-        foreach ($typeOneGroup as $typeOne) {
-            $faker = \Faker\Factory::create();
-            for ($i = 1; $i <= 20; $i++) {
-                DB::table('posts')->insert([
-                    'user_id' => $typeOne->id,
-                    'category_id' => rand(1, 100),
-                    'type_id' => rand(1, 100),
-                    'title' => Str::random(10),
-                    'description' => Str::random(100),
-                    'country_id' => rand(1, 242),
-                    'city' => Str::random(7),
-                    'address' => Str::random(10),
-                    'zip_code' => $faker->postcode(),
-                    'latitude' => rand(1, 100) / 10,
-                    'longitude' => rand(1, 100) / 10,
-                    'status' => rand(1, 10),
-                    'price' => rand(1, 100)
-                ]);
-            }
-        }
-        foreach ($typeTwoGroup as $typeTwo) {
-            $faker = \Faker\Factory::create();
-            for ($i = 1; $i <= 20; $i++) {
-                DB::table('posts')->insert([
-                    'user_id' => $typeTwo->id,
-                    'category_id' => rand(1, 100),
-                    'type_id' => rand(1, 100),
-                    'title' => Str::random(10),
-                    'description' => Str::random(100),
-                    'country_id' => rand(1, 242),
-                    'city' => Str::random(7),
-                    'address' => Str::random(10),
-                    'zip_code' => $faker->postcode(),
-                    'latitude' => rand(1, 100) / 10,
-                    'longitude' => rand(1, 100) / 10,
-                    'status' => rand(1, 10),
-                    'price' => rand(1, 100)
-                ]);
-            }
-        }
-        foreach ($typeThreeGroup as $typeThree) {
-            $faker = \Faker\Factory::create();
-            for ($i = 1; $i <= 20; $i++) {
-                DB::table('posts')->insert([
-                    'user_id' => $typeThree->id,
-                    'category_id' => rand(1, 100),
-                    'type_id' => rand(1, 100),
-                    'title' => Str::random(10),
-                    'description' => Str::random(100),
-                    'country_id' => rand(1, 242),
-                    'city' => Str::random(7),
-                    'address' => Str::random(10),
-                    'zip_code' => $faker->postcode(),
-                    'latitude' => rand(1, 100) / 10,
-                    'longitude' => rand(1, 100) / 10,
-                    'status' => rand(1, 10),
-                    'price' => rand(1, 100)
-                ]);
+                $posts = Post::factory()->count(20)->make();
+                foreach ($posts as $post) {
+                    DB::table('posts')->insert([
+                        'user_id' => $user->id,
+                        'category_id' => $post['category_id'],
+                        'type_id' => $post['type_id'],
+                        'title' => $post['title'],
+                        'description' => $post['description'],
+                        'country_id' => $post['country_id'],
+                        'city' => $post['city'],
+                        'address' => $post['address'],
+                        'zip_code' => $post['zip_code'],
+                        'latitude' => $post['latitude'],
+                        'longitude' => $post['longitude'],
+                        'status' => $post['status'],
+                        'price' => $post['price']
+                    ]);
+                }
             }
         }
     }

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -14,11 +15,11 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i = 1; $i <= 100; $i++) {
+        $categories = Category::factory()->count(100)->make();
+        foreach ($categories as $category) {
             DB::table('categories')->insert([
-                'id' => $i,
-                'name' => Str::random(10),
-                'parent_category_id' => rand(1, 100)
+                'name' => $category['name'],
+                'parent_category_id' => $category['parent_category_id'],
             ]);
         }
     }

@@ -19,19 +19,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $countries = new CountrySeeder;
-        $countries->run();
-
-        $categories = new CategorySeeder;
-        $categories->run();
-
-        $postTypes = new PostTypeSeeder;
-        $postTypes->run();
-
-        $users = new UserSeeder;
-        $users->run();
-
-        $posts = new PostSeeder;
-        $posts->run();
+        $this->call(CategorySeeder::class);
+        $this->call(CountrySeeder::class);
+        $this->call(PostTypeSeeder::class);
+        $this->call(UserSeeder::class);
+        $this->call(PostSeeder::class);
     }
 }

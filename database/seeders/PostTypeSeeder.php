@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\PostType;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -13,10 +14,10 @@ class PostTypeSeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i = 1; $i <= 100; $i++) {
+        $postTypes = PostType::factory()->count(100)->make();
+        foreach ($postTypes as $postType) {
             DB::table('post_types')->insert([
-                'id' => $i,
-                'type' => rand(1, 100),
+                'type' => $postType['type'],
             ]);
         }
     }
