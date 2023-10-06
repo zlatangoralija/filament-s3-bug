@@ -4,11 +4,16 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
+use App\Models\Category;
 use App\Models\Post;
+use App\Models\PostType;
+use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -79,47 +84,64 @@ class PostResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_id')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('category_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('type_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('country_id')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('user')
+                    ->searchable()
+                    ->sortable()
+                    ->formatStateUsing(fn (string $state, Post $post): string => __($post->user->name)),
+                Tables\Columns\TextColumn::make('category')
+                    ->sortable()
+                    ->searchable()
+                    ->formatStateUsing(fn (string $state, Post $post): string => __($post->category->name)),
+                Tables\Columns\TextColumn::make('type')
+                    ->numeric()
+                    ->sortable()
+                    ->formatStateUsing(fn (string $state, Post $post): string => __($post->type->type)),
+                Tables\Columns\TextColumn::make('country')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('city')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('address')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('zip_code')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('latitude')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('longitude')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('active')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('status')
-                    ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->formatStateUsing(fn (string $state, Post $post): string => __($post->getStatus())),
                 Tables\Columns\TextColumn::make('price')
                     ->money()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('price_negotiable')
-                    ->boolean(),
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('available_from')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('available_until')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('last_renewed_on')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -130,13 +152,56 @@ class PostResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('last_renewed_on')
-                    ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('category_id')
+                    ->options(Category::pluck('name', 'id'))
+                    ->multiple()
+                    ->label('Category'),
+                Tables\Filters\SelectFilter::make('type_id')
+                    ->options(PostType::pluck('type', 'id'))
+                    ->multiple()
+                    ->label('Type'),
+                Tables\Filters\SelectFilter::make('active')
+                    ->options([0, 1])
+                    ->label('Active'),
+                Tables\Filters\SelectFilter::make('status')
+                    ->options(Post::getStatuses())
+                    ->label('Status'),
+                Tables\Filters\Filter::make('created_at')
+                    ->form([
+                        DatePicker::make('created_from'),
+                        DatePicker::make('created_until'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    }),
+                Tables\Filters\Filter::make('available_from')
+                    ->form([
+                        DatePicker::make('available_from'),
+                        DatePicker::make('available_until'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['available_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('available_from', '>=', $date),
+                            )
+                            ->when(
+                                $data['available_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('available_until', '<=', $date),
+                            );
+                    })
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

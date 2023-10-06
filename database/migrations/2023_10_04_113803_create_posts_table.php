@@ -33,8 +33,8 @@ return new class extends Migration
             $table->double('price');
             $table->boolean('price_negotiable')->default(0);
             $table->json('attributes')->nullable();
-            $table->date('available_from')->nullable();
-            $table->date('available_until')->nullable();
+            $table->timestamp('available_from')->nullable();
+            $table->timestamp('available_until')->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->timestamp('last_renewed_on')->nullable();
