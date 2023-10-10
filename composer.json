@@ -15,10 +15,11 @@
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.8",
-        "tightenco/ziggy": "^1.0",
+        "league/flysystem-aws-s3-v3": "^3.16",
         "pragmarx/countries": "^0.8.2",
         "psr/simple-cache": "^2.0",
-        "robinvdvleuten/ulid": "^5.0"
+        "robinvdvleuten/ulid": "^5.0",
+        "tightenco/ziggy": "^1.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

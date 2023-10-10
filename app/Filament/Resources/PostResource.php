@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\PostImageResource\RelationManagers\ImagesRelationManager;
 use App\Filament\Resources\PostResource\Pages;
-use App\Filament\Resources\PostResource\RelationManagers;
 use App\Models\Category;
+use App\Models\Country;
 use App\Models\Post;
 use App\Models\PostType;
 use App\Models\User;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Form;
@@ -17,6 +19,7 @@ use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class PostResource extends Resource
 {
@@ -31,15 +34,18 @@ class PostResource extends Resource
                 Forms\Components\TextInput::make('user_id')
                     ->required()
                     ->maxLength(36),
-                Forms\Components\TextInput::make('category_id')
+                Forms\Components\Select::make('category_id')
+                    ->label('Category')
                     ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('type_id')
+                    ->options(Category::pluck('name', 'id')),
+                Forms\Components\Select::make('type_id')
+                    ->label('Post type')
                     ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('country_id')
+                    ->options(PostType::pluck('type', 'id')),
+                Forms\Components\Select::make('country_id')
+                    ->label('Country')
                     ->required()
-                    ->numeric(),
+                    ->options(Country::pluck('name', 'id')),
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->maxLength(255),
@@ -73,10 +79,31 @@ class PostResource extends Resource
                     ->prefix('$'),
                 Forms\Components\Toggle::make('price_negotiable')
                     ->required(),
-                Forms\Components\TextInput::make('attributes'),
+                Forms\Components\TextInput::make('attributes')->nullable(),
                 Forms\Components\DatePicker::make('available_from'),
                 Forms\Components\DatePicker::make('available_until'),
                 Forms\Components\DateTimePicker::make('last_renewed_on'),
+                Forms\Components\FileUpload::make('featured_image')
+                    ->disk('s3')
+                    ->directory('posts')
+                    ->visibility('private')
+                    ->image()
+                    ->columnSpanFull()
+                    ->getUploadedFileNameForStorageUsing(
+                        fn (TemporaryUploadedFile $file): string => (string) str($file->getClientOriginalName())
+                            ->prepend(Carbon::now()->timestamp . '-')),
+                Forms\Components\FileUpload::make('additional_images')
+                    ->disk('s3')
+                    ->directory('posts')
+                    ->visibility('private')
+                    ->multiple()
+                    ->minFiles(1)
+                    ->maxFiles(10)
+                    ->image()
+                    ->columnSpanFull()
+                    ->getUploadedFileNameForStorageUsing(
+                        fn (TemporaryUploadedFile $file): string => (string) str($file->getClientOriginalName())
+                            ->prepend(Carbon::now()->timestamp . '-'))
             ]);
     }
 
@@ -216,7 +243,7 @@ class PostResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ImagesRelationManager::class,
         ];
     }
 
